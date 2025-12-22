@@ -1,0 +1,16 @@
+Company,Ticker,Announcement_Date,Source_URL,Summary
+Wells Fargo & Co,WFC,9/8/2016,abcnews,Fake accounts scandal exposed
+Volkswagen AG,VWAGY,9/18/2015,https://www.theguardian.com/business/2015/dec/10/volkswagen-emissions-scandal-timeline-events,Emissions cheating ('Dieselgate') revealed
+Wirecard AG,WDI.DE,6/18/2020,https://www.ft.com/content/284fb1ad-ddc0-45df-a075-0709b36868db,€1.9B accounting fraud uncovered
+Toshiba Corp,TOSYY,7/20/2015,https://www.global.toshiba/content/dam/toshiba/migration/corp/irAssets/about/ir/en/news/20151208_2.pdf,Accounting scandal ($1.2B overstated profits)
+Luckin Coffee,LKNCY,4/2/2020,https://www.cnbc.com/2020/04/02/luckin-coffee-stock-plummets-after-investigation-finds-coo-fabricated-sales.html,Fabricated $310M in sales
+Goldman Sachs,GS,10/22/2020,https://www.justice.gov/archives/opa/pr/goldman-sachs-charged-foreign-bribery-case-and-agrees-pay-over-29-billion,1MDB bribery case settlement
+Credit Suisse Group AG,CS,10/19/2021,https://www.justice.gov/archives/opa/pr/credit-suisse-resolves-fraudulent-mozambique-loan-case-547-million-coordinated-global,Fraudulent Mozambique loan scheme
+Deutsche Bank AG,DB,1/17/2017,https://www.justice.gov/archives/opa/pr/deutsche-bank-agrees-pay-72-billion-misleading-investors-its-sale-residential-mortgage-backed,Mortgage-backed securities fraud
+Glencore PLC,GLEN.L,5/24/2022,https://www.justice.gov/archives/opa/pr/glencore-entered-guilty-pleas-foreign-bribery-and-market-manipulation-schemes,Bribery and market manipulation charges
+Uber Technologies Inc,UBER,11/21/2017,https://www.breaches.cloud/incidents/uber/,Concealed massive 2016 data breach
+Boeing Co,BA,1/7/2021,https://www.justice.gov/archives/opa/pr/boeing-charged-737-max-fraud-conspiracy-and-agrees-pay-over-25-billion,737 MAX fraud settlement
+Meta Platforms Inc,META,3/19/2018,https://www.theguardian.com/news/2018/mar/17/cambridge-analytica-facebook-influence-us-election,Cambridge Analytica data misuse scandal
+Equifax Inc,EFX,9/7/2017,https://archive.epic.org/privacy/data-breach/equifax/,Data breach and insider trading allegations
+Wells Fargo & Co,WFC,2/21/2020,https://www.justice.gov/archives/opa/pr/wells-fargo-agrees-pay-3-billion-resolve-criminal-and-civil-investigations-sales-practices,$3B DOJ settlement over fake accounts
+HSBC Holdings PLC,HSBC,12/11/2012,https://www.justice.gov/archives/opa/pr/hsbc-holdings-plc-and-hsbc-bank-usa-na-admit-anti-money-laundering-and-sanctions-violations,Money laundering settlement
