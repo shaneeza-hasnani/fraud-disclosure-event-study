@@ -1,0 +1,24 @@
+# Generated outputs
+output/*.csv
+output/figures/*.png
+
+# Jupyter
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Legacy CSV outputs in root (before output/ reorganization)
+abnormal_returns.csv
+cumulative_abnormal_returns.csv
+event_study_summary.csv
+fraud_disclosure_dates.csv
+fraud_disclosure_dates_with_sources.csv

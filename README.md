@@ -1,108 +1,100 @@
 # Market Reaction to Corporate Fraud Disclosures
 
-## Executive Summary
-This project examines how equity markets respond to corporate fraud disclosures. Using an event study framework grounded in the Fama–French Three-Factor Model, the analysis measures abnormal stock returns around confirmed fraud announcement dates. Results show that fraud disclosures trigger economically meaningful and statistically significant negative abnormal returns, with evidence of continued market adjustment in the days following disclosure.
+An event study measuring abnormal stock returns around 25 confirmed corporate fraud disclosure dates using the **Fama–French Three-Factor Model**.
 
----
-
-## Business Problem
-Corporate fraud represents a sudden and severe information shock to investors. When fraud is disclosed, markets must rapidly reassess a firm’s future cash flows, litigation risk, regulatory exposure, and reputational damage.
-
-This analysis addresses the following questions:
-- Do fraud disclosures generate abnormal stock price reactions?
-- How quickly does the market incorporate fraud-related information?
-- Are price effects confined to the announcement day, or do they persist afterward?
-
-Understanding these dynamics is critical for investors, regulators, risk managers, and compliance professionals.
-
----
-
-## Data Overview
-- **Fraud Events**: 25 publicly listed firms with well-documented fraud disclosures between 2015 and 2022
-  - Sources include SEC enforcement actions, DOJ settlements, whistleblower reports, and investigative journalism
-- **Stock Prices**: Daily adjusted closing prices from Yahoo Finance
-- **Market Benchmark**: S&P 500 Index (^GSPC)
-- **Risk Factors**: Fama–French Three-Factor daily data (Market, Size, Value) and risk-free rate
-
-The final dataset includes over 2,100 trading days of returns per firm, providing sufficient depth for reliable estimation windows.
-
----
-
-## Methodology
-- Identified a single, validated disclosure date for each fraud event
-- Adjusted disclosure dates to the nearest trading day when necessary
-- Computed daily log returns for all firms
-- Estimated expected returns using the Fama–French Three-Factor Model
-- Calculated:
-  - **Abnormal Returns (AR)**: Actual return minus expected return
-  - **Cumulative Abnormal Returns (CAR)** over the event window
-- Applied cross-sectional t-tests to assess statistical significance of abnormal returns
-
-**Windows**
-- Estimation Window: −150 to −30 trading days before disclosure
-- Event Window: −10 to +10 trading days around disclosure
-
-This structure isolates fraud-related price effects while controlling for market-wide movements.
-
----
-
-## Skills Demonstrated
-**Technical**
-- Event study design and implementation
-- Financial time series analysis
-- Factor-based asset pricing (Fama–French)
-- Regression modeling and hypothesis testing
-- Abnormal return and cumulative return calculations
-- Data validation and trading-calendar alignment
-
-**Analytical & Business**
-- Translating financial theory into empirical analysis
-- Interpreting market reactions to corporate misconduct
-- Risk and compliance-oriented financial reasoning
-- Communicating statistical findings to non-technical audiences
+![CAAR Plot](output/figures/aar_caar.png)
 
 ---
 
 ## Key Results
-- Fraud disclosures are associated with sharp negative abnormal returns
-- Day 0 shows a large negative Average Abnormal Return, though not statistically significant
-- Statistically significant negative abnormal returns occur on:
-  - **Day +1**
-  - **Day +6**
-- Cumulative Average Abnormal Returns (CAAR) decline steadily after disclosure, reaching approximately −20% by Day +10
-- Results suggest that market adjustment to fraud information is not instantaneous and unfolds over multiple trading days
+
+| Metric | Value |
+|---|---|
+| CAAR by Day +10 | ≈ −20% |
+| Significant AAR days (p < 0.05) | Day +1, Day +6 |
+| Sample | 25 firms, 2015–2022 |
+| Model | Fama–French 3-Factor (OLS) |
+
+Fraud disclosures trigger economically meaningful negative abnormal returns. Markets do not fully price fraud information on Day 0 — continued negative drift through Day +10 indicates ongoing reassessment of firm risk, legal exposure, and credibility.
+
+Results are robust to:
+- Winsorization of extreme returns
+- Outlier exclusion (Luckin Coffee)
+- Alternative event windows ([-5, +5] and [-1, +1])
+- Single-factor CAPM specification
 
 ---
 
-## Interpretation
-Markets react quickly to fraud disclosures, but not all information is fully priced on the announcement day. Continued negative abnormal returns indicate ongoing reassessment of firm risk, legal exposure, and credibility. This delayed response highlights how complex and uncertain fraud-related information can be for investors.
+## Quick Start
+
+```bash
+pip install -r requirements.txt
+# or
+make setup
+```
+
+Then open and run `notebooks/event_study_analysis.ipynb`.
+
+---
+
+## Project Structure
+
+```
+├── README.md
+├── requirements.txt
+├── Makefile
+├── LICENSE
+├── data/
+│   ├── README.md
+│   └── Fraud_events.csv
+├── src/
+│   ├── __init__.py
+│   └── event_study.py          # Core logic: estimation, AR calc, stats, plots
+├── notebooks/
+│   └── event_study_analysis.ipynb  # Analysis narrative + results
+└── output/                     # Generated (gitignored)
+    ├── *.csv
+    └── figures/*.png
+```
+
+---
+
+## Methodology
+
+1. **Estimation window** (Day −150 to −30): Estimate factor loadings via OLS regression of excess returns on Mkt-RF, SMB, and HML.
+2. **Event window** (Day −10 to +10): Compute abnormal returns as actual minus expected returns.
+3. **Cross-sectional tests**: Parametric t-tests, Wilcoxon signed-rank, and binomial sign tests. Benjamini–Hochberg correction for multiple comparisons.
+
+$$AR_{i,t} = (R_{i,t} - R_f) - \hat{\alpha}_i - \hat{\beta}_1 (R_m - R_f) - \hat{\beta}_2 \text{SMB} - \hat{\beta}_3 \text{HML}$$
+
+---
+
+## Data Sources
+
+- **Fraud events**: Manually curated from SEC enforcement actions, DOJ settlements, whistleblower reports, and investigative journalism
+- **Stock prices**: Yahoo Finance (via `yfinance`)
+- **Risk factors**: Kenneth French Data Library (via `pandas_datareader`)
 
 ---
 
 ## Limitations
-- Analysis uses the Fama–French Three-Factor Model and excludes momentum or industry-specific factors
+
+- Sample limited to 25 high-profile cases (generalizability constraint)
+- Fama–French model excludes momentum and industry factors
 - Some disclosures may coincide with other firm-specific news
-- Sample consists of high-profile fraud cases, limiting generalizability
-- CAAR significance is marginal for longer windows and should be interpreted cautiously
+- CAAR significance is marginal for longer windows
 
 ---
 
-## Business Implications
-- Fraud imposes immediate and sustained shareholder value loss
-- Markets penalize not just the event itself, but the uncertainty that follows
-- Event studies can support enforcement impact assessments, litigation analysis, and risk monitoring
-- Compliance failures have measurable financial consequences beyond reputational harm
+## References
+
+- Fama, E.F. & French, K.R. (1993). Common risk factors in the returns on stocks and bonds. *Journal of Financial Economics*, 33(1), 3–56.
+- MacKinlay, A.C. (1997). Event studies in economics and finance. *Journal of Economic Literature*, 35(1), 13–39.
+- Karpoff, J.M., Lee, D.S. & Martin, G.S. (2008). The cost to firms of cooking the books. *Journal of Financial and Quantitative Analysis*, 43(3), 581–611.
+- Dyck, A., Morse, A. & Zingales, L. (2010). Who blows the whistle on corporate fraud? *Journal of Finance*, 65(6), 2213–2253.
 
 ---
 
-## Next Steps
-- Extend the event window to analyze long-term drift
-- Incorporate additional risk factors such as momentum
-- Examine cross-sectional differences by firm size or industry
-- Test sensitivity to alternative model specifications
+## License
 
----
-
-## Repository Contents
-- `/notebooks`: Python notebook implementing the full event study workflow
-- `/data`: Curated fraud event list used for analysis
+[MIT](LICENSE)
