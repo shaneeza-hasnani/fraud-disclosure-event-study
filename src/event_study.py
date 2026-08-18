@@ -196,7 +196,7 @@ def sign_test(ar_df):
         vals = ar_df.loc[day].dropna()
         n = len(vals)
         n_neg = (vals < 0).sum()
-        p = stats.binom_test(n_neg, n, 0.5) if n > 0 else np.nan
+        p = stats.binomtest(n_neg, n, 0.5).pvalue if n > 0 else np.nan
         results.append({
             "Relative_Day": day,
             "N_negative": int(n_neg),
@@ -233,51 +233,86 @@ def winsorize_ar(ar_df, limits=(0.05, 0.05)):
 # ---------------------------------------------------------------------------
 
 def plot_aar_caar(summary, ar_df, car_df, save_path=None):
-    """Publication-quality AAR and CAAR plots with confidence intervals."""
+    """Create the README's primary AAR/CAAR figure."""
     import matplotlib.pyplot as plt
-    import seaborn as sns
 
-    sns.set_style("whitegrid")
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+    navy = "#183153"
+    blue = "#2F6B9A"
+    orange = "#D97706"
+    grid = "#D9E1E8"
+    text = "#17212B"
 
-    idx = summary.index
-    ar_sem = ar_df.sem(axis=1)
-    car_sem = car_df.sem(axis=1)
+    with plt.rc_context({
+        "font.family": "DejaVu Sans",
+        "axes.titleweight": "bold",
+        "axes.labelcolor": text,
+        "xtick.color": "#53606C",
+        "ytick.color": "#53606C",
+    }):
+        fig, (ax1, ax2) = plt.subplots(
+            2, 1, figsize=(12, 8.4), sharex=True,
+            gridspec_kw={"height_ratios": [1, 1.35], "hspace": 0.30},
+        )
+        fig.patch.set_facecolor("white")
 
-    # --- AAR ---
-    ax1.bar(idx, summary["AAR"] * 100, color="steelblue", alpha=0.7, zorder=2)
-    ax1.errorbar(idx, summary["AAR"] * 100, yerr=1.96 * ar_sem * 100,
-                 fmt="none", color="black", capsize=3, zorder=3)
-    sig_days = summary[summary["AAR_p_val"] < 0.05].index
-    for d in sig_days:
-        y = summary.loc[d, "AAR"] * 100
-        offset = -1.5 if y < 0 else 1.0
-        ax1.annotate("*", xy=(d, y), xytext=(d, y + offset),
-                      fontsize=16, ha="center", color="red", fontweight="bold")
-    ax1.axvline(0, color="red", linestyle="--", linewidth=1.2, alpha=0.7)
-    ax1.axhline(0, color="black", linewidth=0.8)
-    ax1.set_title("Average Abnormal Returns (AAR) Around Fraud Disclosure", fontsize=14)
-    ax1.set_ylabel("AAR (%)", fontsize=12)
-    ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:+.1f}%"))
+        idx = summary.index.to_numpy(dtype=float)
+        aar = summary["AAR"].to_numpy(dtype=float) * 100
+        caar = summary["CAAR"].to_numpy(dtype=float) * 100
+        ar_ci = ar_df.sem(axis=1).to_numpy(dtype=float) * 1.96 * 100
+        car_ci = car_df.sem(axis=1).to_numpy(dtype=float) * 1.96 * 100
 
-    # --- CAAR ---
-    ax2.plot(idx, summary["CAAR"] * 100, marker="o", color="darkgreen",
-             linewidth=2, zorder=3)
-    ax2.fill_between(idx,
-                     (summary["CAAR"] - 1.96 * car_sem) * 100,
-                     (summary["CAAR"] + 1.96 * car_sem) * 100,
-                     color="green", alpha=0.15, zorder=2)
-    ax2.axvline(0, color="red", linestyle="--", linewidth=1.2, alpha=0.7)
-    ax2.axhline(0, color="black", linewidth=0.8)
-    ax2.set_title("Cumulative Average Abnormal Returns (CAAR) Around Fraud Disclosure",
-                  fontsize=14)
-    ax2.set_xlabel("Event Day (0 = Disclosure Date)", fontsize=12)
-    ax2.set_ylabel("CAAR (%)", fontsize=12)
-    ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:+.1f}%"))
+        colors = [orange if value < 0 else blue for value in aar]
+        ax1.bar(idx, aar, width=0.72, color=colors, edgecolor="white", linewidth=0.5, zorder=3)
+        ax1.errorbar(idx, aar, yerr=ar_ci, fmt="none", color="#53606C",
+                     linewidth=1, capsize=2.5, zorder=4)
+        ax1.set_title("Daily average abnormal return", loc="left", fontsize=13, color=text, pad=10)
+        ax1.set_ylabel("AAR")
 
-    plt.tight_layout()
+        ax2.fill_between(idx, caar - car_ci, caar + car_ci,
+                         color=blue, alpha=0.14, linewidth=0, label="95% confidence interval")
+        ax2.plot(idx, caar, color=navy, linewidth=3, marker="o", markersize=4.5,
+                 markerfacecolor="white", markeredgewidth=1.5, zorder=4, label="CAAR")
+        ax2.set_title("Cumulative average abnormal return", loc="left", fontsize=13,
+                      color=text, pad=10)
+        ax2.set_xlabel("Trading days relative to disclosure")
+        ax2.set_ylabel("CAAR")
+        ax2.legend(frameon=False, loc="lower left", ncol=2)
+
+        final_day = int(idx[-1])
+        final_value = caar[-1]
+        ax2.annotate(
+            f"Day {final_day:+d}: {final_value:+.1f}%",
+            xy=(idx[-1], final_value), xytext=(-12, 24), textcoords="offset points",
+            ha="right", va="bottom", fontsize=11, fontweight="bold", color=navy,
+            arrowprops={"arrowstyle": "-", "color": navy, "lw": 1.2},
+        )
+
+        for ax in (ax1, ax2):
+            ax.set_facecolor("white")
+            ax.axvline(0, color=orange, linestyle=(0, (4, 3)), linewidth=1.5, zorder=2)
+            ax.axhline(0, color="#7B8792", linewidth=0.9, zorder=2)
+            ax.grid(axis="y", color=grid, linewidth=0.8, alpha=0.8, zorder=1)
+            ax.grid(axis="x", visible=False)
+            ax.spines[["top", "right", "left"]].set_visible(False)
+            ax.tick_params(axis="y", length=0)
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:+.0f}%"))
+
+        ax2.set_xticks(idx)
+        ax2.text(0, 1.02, "Disclosure", transform=ax2.get_xaxis_transform(),
+                 ha="center", va="bottom", fontsize=9, color=orange, fontweight="bold")
+
+        fig.suptitle("Market reaction around corporate fraud disclosures",
+                     x=0.08, y=0.985, ha="left", fontsize=20, fontweight="bold", color=text)
+        fig.text(0.08, 0.945,
+                 f"Fama-French three-factor event study | {ar_df.shape[1]} firms | event window: -10 to +10 trading days",
+                 ha="left", fontsize=10.5, color="#53606C")
+        fig.text(0.08, 0.015,
+                 "Bars show AAR; line shows CAAR. Shaded bands and error bars are 95% confidence intervals.",
+                 ha="left", fontsize=9, color="#66737F")
+
+    fig.subplots_adjust(left=0.08, right=0.98, top=0.88, bottom=0.09)
     if save_path:
-        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+        fig.savefig(save_path, dpi=180, bbox_inches="tight", facecolor="white")
     return fig
 
 

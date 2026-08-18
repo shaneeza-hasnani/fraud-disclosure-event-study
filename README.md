@@ -1,8 +1,8 @@
 # Market Reaction to Corporate Fraud Disclosures
 
-An event study measuring abnormal stock returns around 25 confirmed corporate fraud disclosure dates using the **Fama–French Three-Factor Model**.
+An event study measuring abnormal stock returns around 25 confirmed corporate fraud disclosure dates using the **Fama-French Three-Factor Model**. The current reproducible run includes 24 firms; Yahoo Finance no longer returns the delisted GOEV series.
 
-![CAAR Plot](output/figures/aar_caar.png)
+![Average and cumulative abnormal returns around corporate fraud disclosures](output/figures/aar_caar.png)
 
 ---
 
@@ -10,12 +10,12 @@ An event study measuring abnormal stock returns around 25 confirmed corporate fr
 
 | Metric | Value |
 |---|---|
-| CAAR by Day +10 | ≈ −20% |
+| CAAR by Day +10 | -23.5% |
 | Significant AAR days (p < 0.05) | Day +1, Day +6 |
-| Sample | 25 firms, 2015–2022 |
-| Model | Fama–French 3-Factor (OLS) |
+| Usable sample | 24 of 25 events, 2015-2022 |
+| Model | Fama-French 3-Factor (OLS) |
 
-Fraud disclosures trigger economically meaningful negative abnormal returns. Markets do not fully price fraud information on Day 0 — continued negative drift through Day +10 indicates ongoing reassessment of firm risk, legal exposure, and credibility.
+The sample shows economically meaningful negative abnormal returns following disclosure. The continued negative drift through Day +10 is consistent with investors reassessing firm risk, legal exposure, and credibility after the initial announcement.
 
 Results are robust to:
 - Winsorization of extreme returns
@@ -33,7 +33,13 @@ pip install -r requirements.txt
 make setup
 ```
 
-Then open and run `notebooks/event_study_analysis.ipynb`.
+Regenerate the complete analysis and all figures from the command line:
+
+```bash
+python scripts/generate_results.py
+```
+
+For the step-by-step analysis, open `notebooks/event_study_analysis.ipynb`.
 
 ---
 
@@ -52,7 +58,9 @@ Then open and run `notebooks/event_study_analysis.ipynb`.
 │   └── event_study.py          # Core logic: estimation, AR calc, stats, plots
 ├── notebooks/
 │   └── event_study_analysis.ipynb  # Analysis narrative + results
-└── output/                     # Generated (gitignored)
+├── scripts/
+│   └── generate_results.py        # Rebuild tables and figures
+└── output/                     # Generated tables + committed README figures
     ├── *.csv
     └── figures/*.png
 ```
@@ -79,8 +87,8 @@ $$AR_{i,t} = (R_{i,t} - R_f) - \hat{\alpha}_i - \hat{\beta}_1 (R_m - R_f) - \hat
 
 ## Limitations
 
-- Sample limited to 25 high-profile cases (generalizability constraint)
-- Fama–French model excludes momentum and industry factors
+- Sample limited to 25 high-profile cases, with 24 usable price histories in the current run
+- Fama-French model excludes momentum and industry factors
 - Some disclosures may coincide with other firm-specific news
 - CAAR significance is marginal for longer windows
 

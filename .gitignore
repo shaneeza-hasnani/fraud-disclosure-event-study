@@ -1,6 +1,9 @@
 # Generated outputs
 output/*.csv
-output/figures/*.png
+# Keep the generated CSVs local, but commit presentation-ready figures so they
+# render in the GitHub README.
+!output/figures/
+!output/figures/*.png
 
 # Jupyter
 .ipynb_checkpoints/
